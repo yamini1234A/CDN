@@ -1,0 +1,46 @@
+trigger:
+  - none
+
+#resources:
+  #repositories:
+    #- repository: global-template
+      #type: git
+      #name: "Path to the repository with custom checks"
+      #ref: refs/heads/master
+variables:
+  - name: changeValue
+    value: 1
+
+parameters:
+  - name: apikey
+    displayName: 'api_key:'
+    type: string
+    default: ' '
+  
+  - name: ddurl
+    displayName: 'dd_url:'
+    type: string
+    default: ' '
+    values:
+      - EMEA
+      - US
+      - US-INET
+
+stages:
+ - stage: 'FindingKeyValue'
+   #dependsOn:
+      #- (uncomment and enter all the stages u want the stage to depend on)
+   pool:
+     vmImage: 'ubuntu-20.04'
+   jobs:
+     - job: 'RowNumber'
+       steps:
+         - task: Bash@3
+           displayName: 'Fetching_line'
+           inputs:
+             targetType: 'inline'
+             script: |
+                echo "Finding the line number"
+                external_variable=api_key
+                LineNumber=$(awk 'match($0,v){print NR; exit}' v=$external_variable ./dd.yaml)
+                echo $LineNumber
